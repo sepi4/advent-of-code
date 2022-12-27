@@ -1,123 +1,105 @@
-// let input = getInput()
-let input = getExampleInput()
-let mArr = input.split(/\n\n/)
-
 class Monkey {
-  op() {
+  inspected = 0
+  index
+  items = []
+  divisibles = []
 
-  }
-
-}
-
-let monkeys = {}
-for (let m of mArr) {
-  let monkey = {}
-  monkey.inspected = 0
-  let indexMatch = m.match(/Monkey (\d+):\n/)
-  monkey.index = indexMatch[1]
-  let itemsMatch = m.match(/Starting items: (.+)\n/)
-  monkey.items = itemsMatch[1].split(', ').map(x => Number(x))
-  let opMatch = m.match(/Operation: new = (.+)\n/)
-  monkey.op = function (old) {
-    if (opMatch[1] === 'old * old') {
-      return Math.floor((old * old) / 3)
-    } else if (opMatch[1] === 'old + old') {
-      return Math.floor((old + old) / 3)
-    } else {
-      let s = opMatch[1].substring(4, 5)
-      let d = opMatch[1].substring(6)
-      if (s === '+') {
-        return Math.floor((old + Number(d)) / 3)
-      } else {
-        return Math.floor((old * Number(d)) / 3)
-      }
-    }
-  }
-
-  let divMatch = m.match(/Test: divisible by (\d+)/)
-  monkey.div = Number(divMatch[1])
-  monkey.test = function (num) {
-    monkey.inspected++
+  constructor(m) {
+    let indexMatch = m.match(/Monkey (\d+):\n/)
+    let itemsMatch = m.match(/Starting items: (.+)\n/)
+    let opMatch = m.match(/Operation: new = (.+)\n/)
+    let divMatch = m.match(/Test: divisible by (\d+)/)
     let trueMatch = m.match(/If true: throw to monkey (\d+)/)
     let falseMatch = m.match(/If false: throw to monkey (\d+)/)
-    if (num % monkey.div === 0) {
-      monkeys[trueMatch[1]].items.push(num)
-    } else {
-      monkeys[falseMatch[1]].items.push(num)
-    }
-  }
-  monkeys[monkey.index] = monkey
-}
 
-// console.log(mArr)
-// console.log(mArr.length)
-// console.log(monkeys)
+    this.index = indexMatch[1]
+    this.items = itemsMatch[1].split(', ').map(x => Number(x))
 
-
-function showInspected(n) {
-  console.log(n, ':\t',
-    monkeys[0].inspected,
-    monkeys[1].inspected,
-    monkeys[2].inspected,
-    monkeys[3].inspected,
-  )
-}
-
-// let round = 10000
-// let round = 1000
-let round = 20
-// let round = 1
-let n = 0
-while (++n <= round) {
-  for (let [k, m] of Object.entries(monkeys)) {
-    m.items = m.items.reverse()
-    let i = 0
-    while (m.items.length) {
-      let v = m.items.pop()
-      // console.log(v)
-      v = m.op(v)
-      if (v === Infinity) {
-        throw Error('Infinity: ' + round)
+    this.operation = function (old) {
+      if (opMatch[1] === 'old * old') {
+        return old * old
+      } else if (opMatch[1] === 'old + old') {
+        return old + old
+      } else {
+        let s = opMatch[1].substring(4, 5)
+        let d = opMatch[1].substring(6)
+        if (s === '+') {
+          return old + Number(d)
+        } else {
+          return old * Number(d)
+        }
       }
-      m.test(v)
     }
-    // console.log('---')
-    i++
-  }
-    showInspected(n)
-}
-// for (let [k, m] of Object.entries(monkeys)) {
-//   for (let v of m.items) {
-//     // console.log(v)
-//   }
-//   // console.log('---')
-// }
-
-let ordered = Object.entries(monkeys).sort((a, b) => b[1].inspected - a[1].inspected)
-// console.log(ordered)
-// console.log(ordered[0][1].inspected, ordered[1][1].inspected)
-// console.log(ordered[0][1].inspected * ordered[1][1].inspected)
-
-
-function show() {
-
-  if (
-    10000 - round === 1 ||
-    10000 - round === 20 ||
-    10000 - round === 1000 ||
-    10000 - round === 2000 ||
-    10000 - round === 3000 ||
-    10000 - round === 4000 ||
-    10000 - round === 5000 ||
-    10000 - round === 6000 ||
-    10000 - round === 7000 ||
-    10000 - round === 8000 ||
-    10000 - round === 9000 ||
-    10000 - round === 10000
-  ) {
-    showInspected()
+    this.div = Number(divMatch[1])
+    this.getNextIndex = function (num) {
+      this.inspected++
+      return num === 0 ? trueMatch[1] : falseMatch[1]
+    }
   }
 }
+
+class D {
+  xxx = {}
+  constructor(num, monkeys) {
+    for (let [k, m] of Object.entries(monkeys)) {
+      this.xxx[m.index] = num % m.div
+    }
+  }
+}
+
+// managed to solve this second part only because my GF is math teacher :)
+// she had idea for algorithm
+function main() {
+  // let input = getExampleInput()
+  let input = getInput()
+  let mArr = input.split(/\n\n/)
+
+  let monkeys = {}
+  for (let m of mArr) {
+    let monkey = new Monkey(m)
+    monkeys[monkey.index] = monkey
+  }
+
+  for (let [k, m] of Object.entries(monkeys)) {
+    for (let x of m.items) {
+      let d = new D(x, monkeys)
+      m.divisibles.push({
+        startingValue: x,
+        d,
+      })
+    }
+  }
+
+  let round = 10000
+  // let round = 1000
+  // let round = 100
+  // let round = 20
+  // let round = 1
+  let n = 0
+  while (++n <= round) {
+    for (let [k, m] of Object.entries(monkeys)) {
+      m.divisibles = m.divisibles.reverse()
+      while (m.divisibles.length) {
+        let obj = m.divisibles.pop()
+        for (let [k, v] of Object.entries(obj.d.xxx)) {
+          let newValue = m.operation(v) % monkeys[k].div
+          obj.d.xxx[k] = newValue
+        }
+        let nextIndex = m.getNextIndex(obj.d.xxx[k])
+        monkeys[nextIndex].divisibles.push(obj)
+      }
+    }
+  }
+
+  let ordered = Object.values(monkeys).sort((a, b) => b.inspected - a.inspected)
+  console.log(ordered[0].inspected * ordered[1].inspected)
+  // console.log(monkeys)
+}
+
+main()
+
+
+
 
 function getExampleInput() {
   return `Monkey 0:
