@@ -1,19 +1,19 @@
-local r = require('read_input')
-local input = r.readInput('input_01.txt')
+local r = require("read_input")
+local input = r.readInput("input_01.txt")
 -- local input = r.readInput('example_01.txt')
 
 local moves = {}
-local s = ''
+local s = ""
 -- print(string.sub(input, 1, 1))
 for i = 1, #input do
   local c = input:sub(i, i)
   -- print(i, c)
-  if c == '\n' or i == #input then
+  if c == "\n" or i == #input then
     table.insert(moves, {
       dir = s:sub(1, 1),
       amount = tonumber(s:sub(2)) % 100,
     })
-    s = ''
+    s = ""
   else
     s = s .. c
   end
@@ -24,7 +24,7 @@ local position = 50
 local times = 0
 
 for _, x in pairs(moves) do
-  if x.dir == 'L' then
+  if x.dir == "L" then
     position = position - x.amount
   else
     position = position + x.amount
@@ -41,4 +41,4 @@ for _, x in pairs(moves) do
   end
 end
 
-print('times', times)
+print("times", times)
