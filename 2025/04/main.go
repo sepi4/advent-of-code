@@ -1,8 +1,9 @@
 package main
 
 import (
-	"2025/lib"
 	"fmt"
+
+	"2025/lib"
 )
 
 func getNextAmount(rows []string, y int, x int) int {
