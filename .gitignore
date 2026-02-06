@@ -1,5 +1,14 @@
+# js
 node_modules
 .vscode
+
+
+# rust
+**/target
+
+
+
+
 
 # Binaries for programs and plugins
 *.exe
