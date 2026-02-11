@@ -44,8 +44,11 @@ func isInCircuit(circ circuit, box *box) bool {
 }
 
 func main() {
-	// text := lib.ReadInput("example.txt")
-	text := lib.ReadInput("input.txt")
+	amount := 10
+	text := lib.ReadInput("example.txt")
+
+	// amount := 1000
+	// text := lib.ReadInput("input.txt")
 
 	rows := lib.GetRows(text)
 	var boxes []box
@@ -77,7 +80,8 @@ func main() {
 
 	var circuits []circuit
 	// for range 10 { // only 10 in example
-	for range boxes { // all boxes in input
+	// for range boxes { // all boxes in input
+	for range amount {
 		last := distances[len(distances)-1]
 		distances = distances[:len(distances)-1]
 		addNew := true
@@ -124,6 +128,6 @@ func main() {
 	// fmt.Println(boxes)
 	// fmt.Println(circuits)
 
-	fmt.Println("dist: ", len(distances))
+	// fmt.Println("dist: ", len(distances))
 	fmt.Println(result)
 }

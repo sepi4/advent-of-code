@@ -6,64 +6,54 @@ async function read(path: string) {
   return data
 }
 
-class Circuit {
-  boxes: Set<Box>
-
-  constructor(boxes: Box[]) {
-    this.boxes = new Set(boxes)
-  }
-
-  private addBoxes(newBoxes: Set<Box>) {
-    for (let nb of newBoxes) {
-      this.boxes.add(nb)
-    }
-  }
-
-  public combineCircuits(c: Circuit) {
-    this.addBoxes(c.boxes)
-    c = this
-  }
-}
+type Distance = { dist: number, a: Box, b: Box }
 
 class Box {
   x: number
   y: number
   z: number
-  circuit: Circuit
+  circuit: number
 
   constructor(x: number, y: number, z: number) {
     this.x = x
     this.y = y
     this.z = z
-    this.circuit = new Circuit([this])
+    this.circuit = -1
   }
 }
 
 function getDistance(a: Box, b: Box): number {
-	let dx =  (a.x - b.x) * (a.x - b.x)
-	let dy = (a.y - b.y) * (a.y - b.y)
-	let dz = (a.z - b.z) * (a.z - b.z)
-	return Math.sqrt(dx + dy + dz)
+  let dx = Math.pow(a.x - b.x, 2)
+  let dy = Math.pow(a.y - b.y, 2)
+  let dz = Math.pow(a.z - b.z, 2)
+  return Math.sqrt(dx + dy + dz)
+}
+
+function changeCircuitId(boxes: Box[], oldId: number, newId: number) {
+  boxes.forEach(box => {
+    if (box.circuit === oldId) {
+      box.circuit = newId
+    }
+  })
 }
 
 async function main() {
-  let amount = 10
-  let text: string = await read('example.txt')
+  // let amount = 10
+  // let text: string = await read('example.txt')
 
-  // let amount = 1000
-  // let text: string = await read('input.txt')
-
+  let amount = 1000
+  let text: string = await read('input.txt')
 
   let rows = text.split('\n')
     .filter(row => row.length > 0)
-  
+
   let boxes = rows.map(row => row.split(',')
-  .map(str => Number(str)))
-  .map(v => new Box(v[0], v[1], v[2]))
+    .map(str => Number(str)))
+    .map(v => new Box(v[0], v[1], v[2]))
 
-  let distances: {dist: number, a: Box, b: Box}[] = []
+  let distances: Distance[] = []
 
-  for (let i = 0; i < boxes.length-1; i++) {
+  for (let i = 0; i < boxes.length - 1; i++) {
     for (let j = i + 1; j < boxes.length; j++) {
       let a = boxes[i]
       let b = boxes[j]
@@ -75,44 +65,43 @@ async function main() {
     }
   }
 
-  distances.sort((v1, v2) => -(v1.dist - v2.dist)) // reversed
+  distances.sort((v1, v2) => (v1.dist - v2.dist))
 
-  // for (let i =0; i < 10; i++) {
-  //   console.log(distances[distances.length - 1 - i])
-  // }
-
-
-
+  let circuitId = 0
   for (let i = 0; i < amount; i++) {
-    let d = distances.pop()
-    console.log(d?.dist)
-    let ac = d?.a.circuit
-    let bc = d?.b.circuit
-    if (ac === undefined || bc === undefined) {
-      throw new Error("undefined circuit");
+    let d = distances[i]
+    if (d.a.circuit === -1 && d.b.circuit === -1) { // molemmat ei ole
+      circuitId++
+      d.a.circuit = circuitId
+      d.b.circuit = circuitId
+    } else if (d.a.circuit == -1 && d.b.circuit != -1) { // a ei ole
+      d.a.circuit = d.b.circuit
+    } else if (d.a.circuit != -1 && d.b.circuit == -1) { // a ei ole 
+      d.b.circuit = d.a.circuit
+    } else if (d.a.circuit != -1 && d.b.circuit != -1) { // molemmat ovat
+      let oldId = d.b.circuit
+      d.b.circuit = d.a.circuit
+      changeCircuitId(boxes, oldId, d.a.circuit)
     }
-    ac.combineCircuits(bc)
   }
 
-  let s = new Set(
-    boxes.map(b => b.circuit)
-  )
-  console.log(s)
+  let cc: { [k: string]: Box[] } = {}
+  for (let box of boxes) {
+    if (box.circuit !== -1) {
+      if (!cc[box.circuit]) {
+        cc[box.circuit] = [box]
+      } else {
+        cc[box.circuit].push(box)
+      }
+    }
+  }
 
-
-
-  // // console.log(boxes[0].circuit.boxes.size)
-  // let xx = boxes.sort((a, b) => -(a.circuit.boxes.size-b.circuit.boxes.size))
-  //   .map(v => v.circuit.boxes)
-  // console.log(xx)
-
-  // let aa = ['1', '2', '3']
-  // let bb = ['2', '1', '3']
-
-  // let setAa = new Set(aa)
-  // console.log(setAa)
-  // let setBb = new Set(bb)
-  // console.log(setBb)
+  let arr = Object.values(cc).sort((a: Box[], b: Box[]) => -(a.length - b.length))
+  let result = 1
+  for (let i = 0; i < 3; i++) {
+    result *= arr[i].length
+  }
+  console.log(result)
 
 }
 
