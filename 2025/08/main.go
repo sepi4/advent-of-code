@@ -12,19 +12,16 @@ import (
 )
 
 type box struct {
-	y float64
-	x float64
-	z float64
+	y       float64
+	x       float64
+	z       float64
+	circuit int
 }
 
 type dist struct {
 	value float64
 	a     *box
 	b     *box
-}
-
-type circuit struct {
-	boxes []*box
 }
 
 func getDistance(a box, b box) float64 {
@@ -34,17 +31,28 @@ func getDistance(a box, b box) float64 {
 	return math.Sqrt(dx + dy + dz)
 }
 
-func isInCircuit(circ circuit, box *box) bool {
-	for i := 0; i < len(circ.boxes); i++ {
-		if circ.boxes[i] == box {
-			return true
+func changeCircuitId(boxes []box, oldId int, newId int) {
+	for i := range boxes {
+		if boxes[i].circuit == oldId {
+			boxes[i].circuit = newId
 		}
 	}
-	return false
+}
+
+func allInSameCircuit(boxes []box) bool {
+	var pre int = -100
+	for i := range boxes {
+		if pre == -100 {
+			pre = boxes[i].circuit
+		} else if boxes[i].circuit != pre {
+			return false
+		}
+	}
+	return true
 }
 
 func main() {
-	amount := 10
+	// amount := 10
 	text := lib.ReadInput("example.txt")
 
 	// amount := 1000
@@ -54,6 +62,8 @@ func main() {
 	var boxes []box
 	var distances []dist
 
+	// for _, v := range arr --- SYNTAKSI LUO KOPION ELEMENTISTÄ, JOTEN KÄYTÄ VAIN KUN LUET
+	// for i := range arr --- KÄYTÄ INDEKSOINTIA KUN HALUAT MUTATOIDA ELEMENTTEJÄ
 	for _, r := range rows {
 		rr := strings.Split(r, ",")
 		var coor []float64
@@ -61,7 +71,12 @@ func main() {
 			i, _ := strconv.ParseFloat(s, 64)
 			coor = append(coor, i)
 		}
-		boxes = append(boxes, box{coor[0], coor[1], coor[2]})
+		boxes = append(boxes, box{
+			x:       coor[0],
+			y:       coor[1],
+			z:       coor[2],
+			circuit: -1,
+		})
 	}
 
 	for i := 0; i < len(boxes)-1; i++ {
@@ -74,60 +89,33 @@ func main() {
 		}
 	}
 
+	// sort distances, first is shotest
 	slices.SortFunc(distances, func(a, b dist) int {
-		return -cmp.Compare(a.value, b.value)
+		return cmp.Compare(a.value, b.value)
 	})
 
-	var circuits []circuit
-	// for range 10 { // only 10 in example
-	// for range boxes { // all boxes in input
-	for range amount {
-		last := distances[len(distances)-1]
-		distances = distances[:len(distances)-1]
-		addNew := true
-		// check if a or b is in some circuit
-		// - if is and other box to that circuit also
-		// - else make new circuit and append to circuits list
-		for ii := 0; ii < len(circuits); ii++ {
-			if isInCircuit(circuits[ii], last.a) {
-				circuits[ii].boxes = append(circuits[ii].boxes, last.b)
-				addNew = false
-				break
-			} else if isInCircuit(circuits[ii], last.b) {
-				circuits[ii].boxes = append(circuits[ii].boxes, last.a)
-				addNew = false
-				break
-			}
+	circuitId := 0
+	for i := 0; i < len(distances); i++ {
+		d := distances[i]
+		if d.a.circuit == -1 && d.b.circuit == -1 { // molemmat eivat ole piirissa
+			circuitId++
+			d.a.circuit = circuitId
+			d.b.circuit = circuitId
+		} else if d.a.circuit == -1 && d.b.circuit != -1 { // b ei ole piirissa
+			d.a.circuit = d.b.circuit
+		} else if d.a.circuit != -1 && d.b.circuit == -1 { // a ei ole  piirissa
+			d.b.circuit = d.a.circuit
+		} else if d.a.circuit != -1 && d.b.circuit != -1 { // molemmat ovat piirissa
+			oldId := d.b.circuit
+			d.b.circuit = d.a.circuit
+			changeCircuitId(boxes, oldId, d.a.circuit)
 		}
-		if addNew {
-			c := circuit{}
-			c.boxes = append(c.boxes, last.a)
-			c.boxes = append(c.boxes, last.b)
-			circuits = append(circuits, c)
+
+		if allInSameCircuit(boxes) {
+			fmt.Println("part2 ===========")
+			fmt.Println("result: ", d.a.x*d.b.x)
+			break
 		}
+
 	}
-
-	slices.SortFunc(circuits, func(a, b circuit) int {
-		return -cmp.Compare(len(a.boxes), len(b.boxes))
-	})
-
-	for _, c := range circuits {
-		fmt.Println("len: ", len(c.boxes))
-	}
-	fmt.Println("----")
-
-	result := 1
-	for i := range 3 {
-		l := len(circuits[i].boxes)
-		result *= l
-		fmt.Println(i, ":", l)
-	}
-
-	// fmt.Println(len(rows))
-	// fmt.Println(rows)
-	// fmt.Println(boxes)
-	// fmt.Println(circuits)
-
-	// fmt.Println("dist: ", len(distances))
-	fmt.Println(result)
 }
