@@ -1,0 +1,51 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
+  "elements": [
+    {
+      "id": "ubrhDz1txwQT4eU4WWI-x",
+      "type": "text",
+      "x": 508.24609375,
+      "y": 207.546875,
+      "width": 924.859130859375,
+      "height": 350,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": null,
+      "seed": 716193966,
+      "version": 1047,
+      "versionNonce": 1575225321,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770868478640,
+      "link": null,
+      "locked": false,
+      "text": "- laske kaikkien mahdollisten yhteyksien pituudet\n    - järjestä yhteys pituuksien mukaan listaan \"distances\"\n- käydään läpi distances listaa pituus järjestyksessä\n    - jos boksit a ja b\n        + molemmat eivät ole jossakin piirissä \n            - luodaan uusi piiri ja merkatan molemmat kuuluvaksi siihen\n        - b ei ole piisissä\n            - laitetaan a:n piiri b:lle\n        - a ei ole piirissä\n            - laitetaan b: piiri a:lle\n        - molemmat ovat jossakin piirissä\n            - laitetaan b:lle a:n piiri\n            - etsitään kaikki muut boksit jossa oli sama piiri kuin b:llä ja vaihdetaan ne a:n piiriksi\n   - päätetään looppi kuin kaikkien boksien piirit ovat samat (part 2)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "- laske kaikkien mahdollisten yhteyksien pituudet\n    - järjestä yhteys pituuksien mukaan listaan \"distances\"\n- käydään läpi distances listaa pituus järjestyksessä\n    - jos boksit a ja b\n        + molemmat eivät ole jossakin piirissä \n            - luodaan uusi piiri ja merkatan molemmat kuuluvaksi siihen\n        - b ei ole piisissä\n            - laitetaan a:n piiri b:lle\n        - a ei ole piirissä\n            - laitetaan b: piiri a:lle\n        - molemmat ovat jossakin piirissä\n            - laitetaan b:lle a:n piiri\n            - etsitään kaikki muut boksit jossa oli sama piiri kuin b:llä ja vaihdetaan ne a:n piiriksi\n   - päätetään looppi kuin kaikkien boksien piirit ovat samat (part 2)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

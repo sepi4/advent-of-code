@@ -37,6 +37,26 @@ function changeCircuitId(boxes: Box[], oldId: number, newId: number) {
   })
 }
 
+function part1(boxes: Box[]) {
+  let cc: { [k: string]: Box[] } = {}
+  for (let box of boxes) {
+    if (box.circuit !== -1) {
+      if (!cc[box.circuit]) {
+        cc[box.circuit] = [box]
+      } else {
+        cc[box.circuit].push(box)
+      }
+    }
+  }
+
+  let arr = Object.values(cc).sort((a: Box[], b: Box[]) => -(a.length - b.length))
+  let result = 1
+  for (let i = 0; i < 3; i++) {
+    result *= arr[i].length
+  }
+  console.log('result:',result)
+}
+
 async function main() {
   // let amount = 10
   // let text: string = await read('example.txt')
@@ -68,41 +88,46 @@ async function main() {
   distances.sort((v1, v2) => (v1.dist - v2.dist))
 
   let circuitId = 0
-  for (let i = 0; i < amount; i++) {
+  for (let i = 0; i < distances.length; i++) {
     let d = distances[i]
-    if (d.a.circuit === -1 && d.b.circuit === -1) { // molemmat ei ole
+
+    if (d.a.circuit === -1 && d.b.circuit === -1) { // molemmat eivat ole piirissa
       circuitId++
       d.a.circuit = circuitId
       d.b.circuit = circuitId
-    } else if (d.a.circuit == -1 && d.b.circuit != -1) { // a ei ole
+    } else if (d.a.circuit == -1 && d.b.circuit != -1) { // b ei ole piirissa
       d.a.circuit = d.b.circuit
-    } else if (d.a.circuit != -1 && d.b.circuit == -1) { // a ei ole 
+    } else if (d.a.circuit != -1 && d.b.circuit == -1) { // a ei ole  piirissa
       d.b.circuit = d.a.circuit
-    } else if (d.a.circuit != -1 && d.b.circuit != -1) { // molemmat ovat
+    } else if (d.a.circuit != -1 && d.b.circuit != -1) { // molemmat ovat piirissa
       let oldId = d.b.circuit
       d.b.circuit = d.a.circuit
       changeCircuitId(boxes, oldId, d.a.circuit)
     }
-  }
 
-  let cc: { [k: string]: Box[] } = {}
-  for (let box of boxes) {
-    if (box.circuit !== -1) {
-      if (!cc[box.circuit]) {
-        cc[box.circuit] = [box]
-      } else {
-        cc[box.circuit].push(box)
-      }
+    if (i + 1 === amount) {
+      console.log('part1 ====================')
+      part1(boxes)
+    }
+    if (allInSameCircuit(boxes)) {
+      console.log('part2 ====================')
+      console.log('result: ', d.a.x * d.b.x)
+      break
     }
   }
 
-  let arr = Object.values(cc).sort((a: Box[], b: Box[]) => -(a.length - b.length))
-  let result = 1
-  for (let i = 0; i < 3; i++) {
-    result *= arr[i].length
-  }
-  console.log(result)
+}
 
+function allInSameCircuit(boxes: Box[]) {
+  let pre = null
+  for (let b of boxes) {
+    if (pre === null) {
+      pre = b.circuit
+    } else if (b.circuit !== pre) {
+      return false
+    }
+  }
+  return true
 }
 
 main()
