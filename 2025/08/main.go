@@ -31,10 +31,10 @@ func getDistance(a box, b box) float64 {
 	return math.Sqrt(dx + dy + dz)
 }
 
-func changeCircuitId(boxes []box, oldId int, newId int) {
+func changeCircuitID(boxes []box, oldID int, newID int) {
 	for i := range boxes {
-		if boxes[i].circuit == oldId {
-			boxes[i].circuit = newId
+		if boxes[i].circuit == oldID {
+			boxes[i].circuit = newID
 		}
 	}
 }
@@ -94,21 +94,21 @@ func main() {
 		return cmp.Compare(a.value, b.value)
 	})
 
-	circuitId := 0
+	circuitID := 0
 	for i := 0; i < len(distances); i++ {
 		d := distances[i]
 		if d.a.circuit == -1 && d.b.circuit == -1 { // molemmat eivat ole piirissa
-			circuitId++
-			d.a.circuit = circuitId
-			d.b.circuit = circuitId
+			circuitID++
+			d.a.circuit = circuitID
+			d.b.circuit = circuitID
 		} else if d.a.circuit == -1 && d.b.circuit != -1 { // b ei ole piirissa
 			d.a.circuit = d.b.circuit
 		} else if d.a.circuit != -1 && d.b.circuit == -1 { // a ei ole  piirissa
 			d.b.circuit = d.a.circuit
 		} else if d.a.circuit != -1 && d.b.circuit != -1 { // molemmat ovat piirissa
-			oldId := d.b.circuit
+			oldID := d.b.circuit
 			d.b.circuit = d.a.circuit
-			changeCircuitId(boxes, oldId, d.a.circuit)
+			changeCircuitID(boxes, oldID, d.a.circuit)
 		}
 
 		if allInSameCircuit(boxes) {
